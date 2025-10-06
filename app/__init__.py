@@ -1,8 +1,7 @@
-
-from flask import Flask
+from flask import Flask, jsonify
 from database import db
 from app.extensions import migrate, ma
-from app.routes import register_routes
+from app.rotadoprojeto import register_routes
 from flasgger import Swagger
 from app.config import DevelopmentConfig  # 👈 aqui
 from app.models import aluno, professor, turma  # garante migrações
@@ -11,7 +10,7 @@ import os
 
 def create_app(config_object=DevelopmentConfig):
     app = Flask(__name__)
-    app.config.from_object(config_class)
+    app.config.from_object(config_object)
     basedir = os.path.abspath(os.path.dirname(__file__) + '/../')
     app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', f"sqlite:///{basedir}/data.db")
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -21,5 +20,6 @@ def create_app(config_object=DevelopmentConfig):
     migrate.init_app(app, db)
     ma.init_app(app)
     Swagger(app)
+    register_routes(app)
 
     return app

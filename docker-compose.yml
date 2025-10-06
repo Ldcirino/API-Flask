@@ -5,5 +5,7 @@ services:
     ports:
       - "5000:5000"
     environment:
-      - FLASK_ENV=development
+      - FLASK_ENV=production
       - DATABASE_URL=sqlite:////app/data.db
+    volumes:
+      - ./data:/app/data

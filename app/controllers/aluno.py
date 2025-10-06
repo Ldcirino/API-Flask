@@ -1,17 +1,21 @@
-from flask import jsonify, request
+from flask import Blueprint, jsonify, request
 from app import db
 from app.models import Aluno
 from datetime import datetime
 
+bp = Blueprint('alunos', __name__, url_prefix='/api/alunos')
 
+@bp.route('/', methods=['GET'])
 def get_alunos():
     alunos = Aluno.query.all()
     return jsonify([a.to_dict() for a in alunos])
 
+@bp.route('/<int:aluno_id>', methods=['GET'])
 def get_aluno(aluno_id):
     aluno = Aluno.query.get_or_404(aluno_id)
     return jsonify(aluno.to_dict())
 
+@bp.route('/', methods=['POST'])
 def create_aluno():
     data = request.get_json()
     data_nascimento = None
@@ -31,6 +35,7 @@ def create_aluno():
     db.session.commit()
     return jsonify(new_aluno.to_dict()), 201
 
+@bp.route('/<int:aluno_id>', methods=['PUT'])
 def update_aluno(aluno_id):
     aluno = Aluno.query.get_or_404(aluno_id)
     data = request.get_json()
@@ -47,6 +52,7 @@ def update_aluno(aluno_id):
     db.session.commit()
     return jsonify(aluno.to_dict())
 
+@bp.route('/<int:aluno_id>', methods=['DELETE'])
 def delete_aluno(aluno_id):
     aluno = Aluno.query.get_or_404(aluno_id)
     db.session.delete(aluno)
