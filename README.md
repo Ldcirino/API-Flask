@@ -30,7 +30,7 @@ Mesmos padrões para /api/turmas e /api/alunos
 
 Swagger UI: /apidocs (rodando localmente)
 
-
+Grupo 11
 Integrantes:
 
 Leonardo Diniz Cirino RA: 2202296
