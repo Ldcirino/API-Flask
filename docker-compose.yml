@@ -1,11 +1,13 @@
 version: '3.8'
+
 services:
-  web:
+  school-api:
     build: .
+    container_name: flask-mvc-school-api
     ports:
       - "5000:5000"
-    environment:
-      - FLASK_ENV=production
-      - DATABASE_URL=sqlite:////app/data.db
     volumes:
-      - ./data:/app/data
+      - ./API-Flask:/app   # Mapeia a pasta local para dentro do container
+    environment:
+      - FLASK_APP=run.py
+      - FLASK_ENV=development

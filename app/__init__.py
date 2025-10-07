@@ -4,7 +4,7 @@ from app.extensions import migrate, ma
 from app.rotadoprojeto import register_routes
 from flasgger import Swagger
 from app.config import DevelopmentConfig  # 👈 aqui
-from app.models import aluno, professor, turma  # garante migrações
+
 
 import os
 
@@ -20,6 +20,8 @@ def create_app(config_object=DevelopmentConfig):
     migrate.init_app(app, db)
     ma.init_app(app)
     Swagger(app)
+
     register_routes(app)
+    
 
     return app
