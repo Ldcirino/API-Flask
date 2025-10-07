@@ -29,3 +29,10 @@ DELETE /api/professores/<id>
 Mesmos padrões para /api/turmas e /api/alunos
 
 Swagger UI: /apidocs (rodando localmente)
+
+
+Integrantes:
+
+Leonardo Diniz Cirino RA: 2202296
+Rafael Ferracini RA: 2403329
+Felipe Oliveira RA: 2404017
