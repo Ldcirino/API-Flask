@@ -1,0 +1,7 @@
+Flask>=2.2
+Flask-SQLAlchemy
+Flask-Migrate
+Flask-Marshmallow
+marshmallow-sqlalchemy
+flasgger
+gunicorn
