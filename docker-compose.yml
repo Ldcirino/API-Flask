@@ -1,0 +1,27 @@
+services:
+  schoolmanager:
+    build: ./SchoolManagerAPI
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./SchoolManagerAPI:/app
+    depends_on:
+      - schoolactivities
+      - schoolreservation
+    container_name: poc_schoolmanager
+
+  schoolactivities:
+    build: ./SchoolActivitiesAPI
+    ports:
+      - "5001:5001"
+    volumes:
+      - ./SchoolActivitiesAPI:/app
+    container_name: poc_schoolactivities
+
+  schoolreservation:
+    build: ./SchoolReservationAPI
+    ports:
+      - "5002:5002"
+    volumes:
+      - ./SchoolReservationAPI:/app
+    container_name: poc_schoolreservation

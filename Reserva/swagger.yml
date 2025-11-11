@@ -1,0 +1,237 @@
+swagger: "2.0"
+info:
+  title: School Reservation API
+  description: Documentação para utilização do School Reservation API, API RESTful construída com Flask para realizar o gerenciamento de Reservas de Salas de uma instituição de ensino.
+  version: "1.0.0"
+
+host: 127.0.0.1:5002
+basePath: /
+schemes:
+  - http
+
+tags:
+  - name: Reservas
+    description: Operações Relacionadas a Entidade Reservas
+
+definitions:
+  Reserva:
+    type: object
+    properties:
+      id:
+        type: integer
+        example: 1
+      num_sala:
+        type: integer
+        example: 4
+      lab:
+        type: boolean
+        example: "True"
+      data:
+        type: string
+        format: date
+        example: "03/11/2025"
+      turma_id:
+        type: integer
+        example: 1
+
+  ReservaInput:
+    type: object
+    required: [id, num_sala, lab, data, turma_id]
+    properties:
+      id:
+        type: integer
+        example: 1
+      num_sala:
+        type: integer
+        example: 4
+      lab:
+        type: boolean
+        example: "True"
+      data:
+        type: string
+        format: date
+        example: "03/11/2025"
+      turma_id:
+        type: integer
+        example: 1
+
+paths:
+# Reservas
+  /reservas:
+    get:
+      tags:
+        - Reservas
+      summary: Listar Reservas Cadastradas
+      operationId: getReservas
+      description: Retorna uma lista de todas as reservas cadastradas no sistema e suas informações ou retorna uma mensagem informando que a lista está vazia
+      responses:
+        200:
+          description: Lista de reservas cadastradas com dados
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Reserva'
+        404:
+          description: Nenhuma Reserva encontrada
+          schema:
+            type: object
+            properties:
+              Erro:
+                type: string
+                example: "Lista de Reservas Vazia!"
+    post:
+      tags:
+        - Reservas
+      summary: Cadastrar Reserva
+      operationId: createReserva
+      description: Cadastar Reserva no sistema e retornar mensagem confirmando o cadastro ou retorna mensagem referente aos erros de Body incompleto ou Reserva já cadastrada ou Turma não encontrada
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/ReservaInput'
+      responses:
+        201:
+          description: Reserva Cadastrada
+          schema:
+            type: object
+            properties:
+              Mensagem:
+                type: string
+                example: "Reserva Cadastrada com Sucesso!"
+        400:
+          description: Dados faltando no corpo da requisição
+          schema:
+            type: object
+            properties:
+              Erro:
+                type: string
+                example: "Formulário Incompleto!"
+        409:
+          description: Sala informada já reservada nessa data
+          schema:
+            type: object
+            properties:
+              Erro:
+                type: string
+                example: "Sala Já Reservada nessa Data!"
+        422:
+          description: Turma não encontrada
+          schema:
+            type: object
+            properties:
+              Erro:
+                type: string
+                example: "Turma não Cadastrada!"
+         
+  /reservas/{reserva_id}:
+    get:
+      tags:
+        - Reservas
+      summary: Exibir Reserva Específica
+      operationId: getReservaById
+      description: Retorna informações de Reserva cadastrada ou retorna uma mensagem informando que não encontrou essa reserva
+      parameters:
+        - name: reserva_id
+          in: path
+          required: true
+          type: integer
+      responses:
+        200:
+          description: Reserva encontrada no sistema
+          schema:
+            $ref: '#/definitions/Reserva'
+        404:
+          description: Nenhuma Reserva encontrada com esse ID
+          schema:
+            type: object
+            properties:
+              Erro:
+                type: string
+                example: "Reserva Não Cadastrada!"
+    put:
+      tags:
+        - Reservas
+      summary: Atualizar Cadastro Reserva
+      operationId: updateReserva
+      description: Atualizar cadastro de Reserva no sistema e retornar mensagem confirmando a atualização ou retorna mensagem referente aos erros de Body incompleto, Reserva não cadastrada, Sala já reservada ou Turma não encontrada 
+      parameters:
+        - name: reserva_id
+          in: path
+          required: true
+          type: integer
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/ReservaInput'
+      responses:
+        200:
+          description: Cadastro Reserva Atualizado
+          schema:
+            type: object
+            properties:
+              Mensagem:
+                type: string
+                example: "Reserva Atualizada com Sucesso!"
+        400:
+          description: Dados faltando no corpo da requisição
+          schema:
+            type: object
+            properties:
+              Erro:
+                type: string
+                example: "Formulário Incompleto!"
+        404:
+          description: Nenhuma Reserva encontrado com esse ID
+          schema:
+            type: object
+            properties:
+              Erro:
+                type: string
+                example: "Reserva Não Cadastrada!"
+        409:
+          description: Sala informada já reservada nessa data
+          schema:
+            type: object
+            properties:
+              Erro:
+                type: string
+                example: "Sala Já Reservada nessa Data!"
+        422:
+          description: Turma não encontrada
+          schema:
+            type: object
+            properties:
+              Erro:
+                type: string
+                example: "Turma não Cadastrada!"
+    delete:
+      tags:
+        - Reservas
+      summary: Deletar Cadastro Reserva
+      operationId: deleteReserva
+      description: Deletar cadastro de Reserva no sistema e retornar mensagem confirmando a exclusão ou retorna uma mensagem informando que não encontrou essa reserva
+      parameters:
+        - name: reserva_id
+          in: path
+          required: true
+          type: integer
+      responses:
+        200:
+          description: Cadastro Reserva Deletado
+          schema:
+            type: object
+            properties:
+              Mensagem:
+                type: string
+                example: "Reserva Cancelada com Sucesso!"
+        404:
+          description: Nenhuma Reserva encontrado com esse ID
+          schema:
+            type: object
+            properties:
+              Erro:
+                type: string
+                example: "Reserva Não Cadastrada!"

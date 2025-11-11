@@ -1,0 +1,474 @@
+swagger: "2.0"
+info:
+  title: School Activities API
+  description: Documentação para utilização do School Activities API, API RESTful construída com Flask para realizar o gerenciamento de Atividades e Notas de uma instituição de ensino.
+  version: "1.0.0"
+
+host: 127.0.0.1:5001
+basePath: /
+schemes:
+  - http
+
+tags:
+  - name: Atividades
+    description: Operações Relacionadas a Entidade Atividades
+  - name: Notas
+    description: Operações Relacionadas a Entidade Notas
+
+definitions:
+  Atividade:
+    type: object
+    properties:
+      id:
+        type: integer
+        example: 1
+      nome_atividade:
+        type: string
+        example: "Laboratório"
+      descricao:
+        type: string
+        example: "Atividade realizada no Laboratório"
+      peso_porcentagem:
+        type: integer
+        example: 1
+      data_entrega:
+        type: string
+        format: date
+        example: "06/11/2025"
+      turma_id:
+        type: integer
+        example: 1
+      professor_id:
+        type: integer
+        example: 1
+
+  AtividadeInput:
+    type: object
+    required: [id, nome_atividade, descricao, peso_porcentagem, data_entrega, turma_id, professor_id]
+    properties:
+      id:
+        type: integer
+        example: 1
+      nome_atividade:
+        type: string
+        example: "Laboratório"
+      descricao:
+        type: string
+        example: "Atividade realizada no Laboratório"
+      peso_porcentagem:
+        type: integer
+        example: 1
+      data_entrega:
+        type: string
+        format: date
+        example: "06/11/2025"
+      turma_id:
+        type: integer
+        example: 1
+      professor_id:
+        type: integer
+        example: 1
+
+  Nota:
+    type: object
+    properties:
+      id:
+        type: integer
+        example: 1
+      nota:
+        type: integer
+        example: 8
+      aluno_id:
+        type: integer
+        example: 1
+
+  NotaInput:
+    type: object
+    required: [id, nota, aluno_id]
+    properties:
+      id:
+        type: integer
+        example: 1
+      nota:
+        type: integer
+        example: 8
+      aluno_id:
+        type: integer
+        example: 1
+
+paths:
+# Atividades
+  /atividades:
+    get:
+      tags:
+        - Atividades
+      summary: Listar Atividades Cadastradas
+      operationId: getAtividades
+      description: Retorna uma lista de todas as atividades cadastradas no sistema e suas informações ou retorna uma mensagem informando que a lista está vazia
+      responses:
+        200:
+          description: Lista de atividades cadastradas com dados
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Atividade'
+        404:
+          description: Nenhuma Atividade encontrada
+          schema:
+            type: object
+            properties:
+              Erro:
+                type: string
+                example: "Lista de Atividades Vazia!"
+    post:
+      tags:
+        - Atividades
+      summary: Cadastrar Atividade
+      operationId: createAtividade
+      description: Cadastar Atividade no sistema e retornar mensagem confirmando o cadastro ou retorna mensagem referente aos erros de Body incompleto, Atividade já cadastrada, Turma não encontrada ou Professor não encontrado
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/AtividadeInput'
+      responses:
+        201:
+          description: Atividade Cadastrada
+          schema:
+            type: object
+            properties:
+              Mensagem:
+                type: string
+                example: "Atividade Cadastrada com Sucesso!"
+        400:
+          description: Dados faltando no corpo da requisição
+          schema:
+            type: object
+            properties:
+              Erro:
+                type: string
+                example: "Formulário Incompleto!"
+        404:
+          description: Turma não encontrada
+          schema:
+            type: object
+            properties:
+              Erro:
+                type: string
+                example: "Turma não Cadastrada!"
+        409:
+          description: Atividade informada já cadastrada nessa data
+          schema:
+            type: object
+            properties:
+              Erro:
+                type: string
+                example: "Atividade dessa Data Já Cadastrada!"
+        422:
+          description: Professor não encontrado
+          schema:
+            type: object
+            properties:
+              Erro:
+                type: string
+                example: "Professor Informado Incorreto!"
+         
+  /atividades/{atividade_id}:
+    get:
+      tags:
+        - Atividades
+      summary: Exibir Atividade Específica
+      operationId: getAtividadeById
+      description: Retorna informações de Atividade cadastrada ou retorna uma mensagem informando que não encontrou essa atividade
+      parameters:
+        - name: atividade_id
+          in: path
+          required: true
+          type: integer
+      responses:
+        200:
+          description: Atividade encontrada no sistema
+          schema:
+            $ref: '#/definitions/Atividade'
+        404:
+          description: Nenhuma Atividade encontrada com esse ID
+          schema:
+            type: object
+            properties:
+              Erro:
+                type: string
+                example: "Atividade Não Cadastrada!"
+    put:
+      tags:
+        - Atividades
+      summary: Atualizar Cadastro Atividade
+      operationId: updateAtividade
+      description: Atualizar cadastro de Atividade no sistema e retornar mensagem confirmando a atualização ou retorna mensagem referente aos erros de Body incompleto, Atividade não cadastrada, Turma não encontrada, Professor Incorreto ou Atividade nessa data já cadastrada
+      parameters:
+        - name: atividade_id
+          in: path
+          required: true
+          type: integer
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/AtividadeInput'
+      responses:
+        200:
+          description: Cadastro Atividade Atualizado
+          schema:
+            type: object
+            properties:
+              Mensagem:
+                type: string
+                example: "Atividade Atualizada com Sucesso!"
+        400:
+          description: Dados faltando no corpo da requisição
+          schema:
+            type: object
+            properties:
+              Erro:
+                type: string
+                example: "Formulário Incompleto!"
+        404:
+          description: Nenhuma Atividade encontrado com esse ID
+          schema:
+            type: object
+            properties:
+              Erro:
+                type: string
+                example: "Atividade Não Cadastrada!"
+        409:
+          description: Atividade nessa data já cadastrada
+          schema:
+            type: object
+            properties:
+              Erro:
+                type: string
+                example: "Atividade dessa Data Já Cadastrada!"
+        422:
+          description: Professor não encontrado
+          schema:
+            type: object
+            properties:
+              Erro:
+                type: string
+                example: "Professor Informado Incorreto!"
+        424:
+          description: Turma não encontrada
+          schema:
+            type: object
+            properties:
+              Erro:
+                type: string
+                example: "Turma não Cadastrada!"
+    delete:
+      tags:
+        - Atividades
+      summary: Deletar Cadastro Atividade
+      operationId: deleteAtividade
+      description: Deletar cadastro de Atividade no sistema e retornar mensagem confirmando a exclusão ou retorna uma mensagem informando que não encontrou essa atividade
+      parameters:
+        - name: atividade_id
+          in: path
+          required: true
+          type: integer
+      responses:
+        200:
+          description: Cadastro Atividade Deletado
+          schema:
+            type: object
+            properties:
+              Mensagem:
+                type: string
+                example: "Atividade Cancelada com Sucesso!"
+        404:
+          description: Nenhuma Atividade encontrado com esse ID
+          schema:
+            type: object
+            properties:
+              Erro:
+                type: string
+                example: "Atividade Não Cadastrada!"
+
+# Notas
+  /notas:
+    get:
+      tags:
+        - Notas
+      summary: Listar Notas Cadastradas
+      operationId: getNotas
+      description: Retorna uma lista de todas as notas cadastradas no sistema e suas informações ou retorna uma mensagem informando que a lista está vazia
+      responses:
+        200:
+          description: Lista de atividades cadastradas com dados
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Nota'
+        404:
+          description: Nenhuma Nota encontrada
+          schema:
+            type: object
+            properties:
+              Erro:
+                type: string
+                example: "Lista de Notas Vazia!"
+    post:
+      tags:
+        - Notas
+      summary: Cadastrar Nota
+      operationId: createNota
+      description: Cadastar Nota no sistema e retornar mensagem confirmando o cadastro ou retorna mensagem referente aos erros de Body incompleto, Atividade não cadastrada, Aluno não encontrado
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/NotaInput'
+      responses:
+        201:
+          description: Nota Cadastrada
+          schema:
+            type: object
+            properties:
+              Mensagem:
+                type: string
+                example: "Nota Cadastrada com Sucesso!"
+        400:
+          description: Dados faltando no corpo da requisição
+          schema:
+            type: object
+            properties:
+              Erro:
+                type: string
+                example: "Formulário Incompleto!"
+        404:
+          description: Aluno não encontrado
+          schema:
+            type: object
+            properties:
+              Erro:
+                type: string
+                example: "Aluno não Cadastrado!"
+        422:
+          description: Atividade não cadastrada
+          schema:
+            type: object
+            properties:
+              Erro:
+                type: string
+                example: "Atividade Não Cadastrada!"
+         
+  /notas/{nota_id}:
+    get:
+      tags:
+        - Notas
+      summary: Exibir Nota Específica
+      operationId: getNotaById
+      description: Retorna informações de Nota cadastrada ou retorna uma mensagem informando que não encontrou essa nota
+      parameters:
+        - name: nota_id
+          in: path
+          required: true
+          type: integer
+      responses:
+        200:
+          description: Atividade encontrada no sistema
+          schema:
+            $ref: '#/definitions/Nota'
+        404:
+          description: Nenhuma Nota encontrada com esse ID
+          schema:
+            type: object
+            properties:
+              Erro:
+                type: string
+                example: "Nota Não Cadastrada!"
+    put:
+      tags:
+        - Notas
+      summary: Atualizar Cadastro Nota
+      operationId: updateNota
+      description: Atualizar cadastro de Atividade no sistema e retornar mensagem confirmando a atualização ou retorna mensagem referente aos erros de Body incompleto, Atividade não cadastrada, Aluno não encontrado
+      parameters:
+        - name: nota_id
+          in: path
+          required: true
+          type: integer
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/NotaInput'
+      responses:
+        200:
+          description: Cadastro Nota Atualizado
+          schema:
+            type: object
+            properties:
+              Mensagem:
+                type: string
+                example: "Nota Atualizada com Sucesso!"
+        400:
+          description: Dados faltando no corpo da requisição
+          schema:
+            type: object
+            properties:
+              Erro:
+                type: string
+                example: "Formulário Incompleto!"
+        404:
+          description: Nenhuma Nota encontrado com esse ID
+          schema:
+            type: object
+            properties:
+              Erro:
+                type: string
+                example: "Nota Não Cadastrada!"
+        422:
+          description: Atividade não cadastrada
+          schema:
+            type: object
+            properties:
+              Erro:
+                type: string
+                example: "Atividade Não Cadastrada!"
+        424:
+          description: Aluno não encontrado
+          schema:
+            type: object
+            properties:
+              Erro:
+                type: string
+                example: "Aluno não Cadastrado!"
+    delete:
+      tags:
+        - Notas
+      summary: Deletar Cadastro Nota
+      operationId: deleteNota
+      description: Deletar cadastro de Nota no sistema e retornar mensagem confirmando a exclusão ou retorna uma mensagem informando que não encontrou essa nota
+      parameters:
+        - name: nota_id
+          in: path
+          required: true
+          type: integer
+      responses:
+        200:
+          description: Cadastro Nota Deletado
+          schema:
+            type: object
+            properties:
+              Mensagem:
+                type: string
+                example: "Nota Deletada com Sucesso!"
+        404:
+          description: Nenhuma Nota encontrado com esse ID
+          schema:
+            type: object
+            properties:
+              Erro:
+                type: string
+                example: "Nota Não Cadastrada!"

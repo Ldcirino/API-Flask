@@ -1,0 +1,636 @@
+swagger: "2.0"
+info:
+  title: School Manager API
+  description: Documentação para utilização do School Manager API, API RESTful construída com Flask para realizar o gerenciamento de Professores, Turmas e Alunos de uma instituição de ensino.
+  version: "1.0.0"
+
+host: 127.0.0.1:5000
+basePath: /
+schemes:
+  - http
+
+tags:
+  - name: Professores
+    description: Operações Relacionadas a Entidade Professores
+  - name: Turmas
+    description: Operações Relacionadas a Entidade Turmas  
+  - name: Alunos
+    description: Operações Relacionadas a Entidade Alunos
+
+definitions:
+  Professor:
+    type: object
+    properties:
+      id:
+        type: integer
+        example: 1
+      nome:
+        type: string
+        example: "Carlos"
+      idade:
+        type: integer
+        example: 32
+      materia:
+        type: string
+        example: "Microserviços"
+      observacoes:
+        type: string
+        example: "Professor com MBA em Redes"
+  Turma:
+    type: object
+    properties:
+      id:
+        type: integer
+        example: 1
+      descricao:
+        type: string
+        example: ADS Periodo Manha
+      ativo:
+        type: boolean
+        example: "True"
+      professor_id:
+        type: integer
+        example: 1
+  Aluno:
+    type: object
+    properties:
+      id:
+        type: integer
+        example: 1
+      nome:
+        type: string
+        example: "Lucas"
+      idade:
+        type: integer
+        example: 27
+      data_nasc:
+        type: string
+        format: date
+        example: "18/11/1998"
+      turma_id:
+        type: integer
+        example: 1
+
+  ProfessorInput:
+    type: object
+    required: [nome, idade, materia]
+    properties:
+      nome:
+        type: string
+        example: "Carlos"
+      idade:
+        type: integer
+        example: 32
+      materia:
+        type: string
+        example: "Microserviços"
+      observacoes:
+        type: string
+        example: ""
+  TurmaInput:
+    type: object
+    required: [descricao, ativo, professor_id]
+    properties:
+      descricao:
+        type: string
+        example: ADS Periodo Manha
+      ativo:
+        type: boolean
+        example: "True"
+      professor_id:
+        type: integer
+        example: 1
+  AlunoInput:
+    type: object
+    required: [nome, idade, data_nasc, turma_id]
+    properties:
+      nome:
+        type: string
+        example: "Lucas"
+      idade:
+        type: integer
+        example: 27
+      data_nasc:
+        type: string
+        format: date
+        example: "18/11/1998"
+      turma_id:
+        type: integer
+        example: 1
+
+paths:
+# Professores
+  /professores:
+    get:
+      tags:
+        - Professores
+      summary: Listar Professores Cadastrados
+      operationId: getProfessores
+      description: Retorna uma lista de todos os professores cadastrados no sistema e suas informações ou retorna uma mensagem informando que a lista está vazia
+      responses:
+        200:
+          description: Lista de professores cadastrados com dados
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Professor'
+        404:
+          description: Nenhum Professor encontrado
+          schema:
+            type: object
+            properties:
+              Erro:
+                type: string
+                example: "Lista de Professores Vazia!"
+    post:
+      tags:
+        - Professores
+      summary: Cadastrar Professor
+      operationId: createProfessor
+      description: Cadastar Professor no sistema e retornar mensagem confirmando o cadastro ou retorna mensagem referente aos erros de Body incompleto ou Professor já cadastrado
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/ProfessorInput'
+      responses:
+        201:
+          description: Professor Cadastrado
+          schema:
+            type: object
+            properties:
+              Mensagem:
+                type: string
+                example: "Professor Cadastrado com Sucesso!"
+        400:
+          description: Dados faltando no corpo da requisição
+          schema:
+            type: object
+            properties:
+              Erro:
+                type: string
+                example: "Formulário Incompleto!"
+        409:
+          description: Professor já cadastrado
+          schema:
+            type: object
+            properties:
+              Erro:
+                type: string
+                example: "Professor Já Cadastrado!"
+         
+  /professores/{professor_id}:
+    get:
+      tags:
+        - Professores
+      summary: Exibir Professor Específico
+      operationId: getProfessorById
+      description: Retorna informações de Professor cadastrado ou retorna uma mensagem informando que não encontrou esse professor
+      parameters:
+        - name: professor_id
+          in: path
+          required: true
+          type: integer
+      responses:
+        200:
+          description: Professor encontrado no sistema
+          schema:
+            $ref: '#/definitions/Professor'
+        404:
+          description: Nenhum Professor encontrado com esse ID
+          schema:
+            type: object
+            properties:
+              Erro:
+                type: string
+                example: "Professor Não Cadastrado!"
+    put:
+      tags:
+        - Professores
+      summary: Atualizar Cadastro Professor
+      operationId: updateProfessor
+      description: Atualizar cadastro de Professor no sistema e retornar mensagem confirmando a atualização ou retorna mensagem referente aos erros de Body incompleto ou Professor não cadastrado
+      parameters:
+        - name: professor_id
+          in: path
+          required: true
+          type: integer
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/ProfessorInput'
+      responses:
+        200:
+          description: Cadastro Professor Atualizado
+          schema:
+            type: object
+            properties:
+              Mensagem:
+                type: string
+                example: "Professor Atualizado com Sucesso!"
+        400:
+          description: Dados faltando no corpo da requisição
+          schema:
+            type: object
+            properties:
+              Erro:
+                type: string
+                example: "Formulário Incompleto!"
+        404:
+          description: Nenhum Professor encontrado com esse ID
+          schema:
+            type: object
+            properties:
+              Erro:
+                type: string
+                example: "Professor Não Cadastrado!"
+    delete:
+      tags:
+        - Professores
+      summary: Deletar Cadastro Professor
+      operationId: deleteProfessor
+      description: Deletar cadastro de Professor no sistema e retornar mensagem confirmando a exclusão ou retorna mensagem referente aos erros de que não encontrou esse professor ou professor vinculado a turma ativa
+      parameters:
+        - name: professor_id
+          in: path
+          required: true
+          type: integer
+      responses:
+        200:
+          description: Cadastro Professor Deletado
+          schema:
+            type: object
+            properties:
+              Mensagem:
+                type: string
+                example: "Professor Deletado com Sucesso!"
+        404:
+          description: Nenhum Professor encontrado com esse ID
+          schema:
+            type: object
+            properties:
+              Erro:
+                type: string
+                example: "Professor Não Cadastrado!"
+        409:
+          description: Professor vinculado a turma ativa
+          schema:
+            type: object
+            properties:
+              Erro:
+                type: string
+                example: "Professor com Turma Vinculada!"
+
+# Turmas
+  /turmas:
+    get:
+      tags:
+        - Turmas
+      summary: Listar Turmas Cadastradas
+      operationId: getTurmas
+      description: Retorna uma lista de todos as Turmas cadastrados no sistema e suas informações ou retorna uma mensagem informando que a lista está vazia
+      responses:
+        200:
+          description: Lista de Turmas cadastradas com dados
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Turma'
+        404:
+          description: Nenhuma Turma encontrada
+          schema:
+            type: object
+            properties:
+              Erro:
+                type: string
+                example: "Lista de Turmas Vazia!"
+    post:
+      tags:
+        - Turmas
+      summary: Cadastrar Turma
+      operationId: createTurma
+      description: Cadastar Turmas no sistema e retornar mensagem confirmando o cadastro ou retorna mensagem referente aos erros de Body incompleto; Professor não cadastrado ou Turma já cadastrada
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/TurmaInput'
+      responses:
+        201:
+          description: Turma Cadastrada
+          schema:
+            type: object
+            properties:
+              Mensagem:
+                type: string
+                example: "Turma Cadastrada com Sucesso!"
+        400:
+          description: Dados faltando no corpo da requisição
+          schema:
+            type: object
+            properties:
+              Erro:
+                type: string
+                example: "Formulário Incompleto!"
+        409:
+          description: Turma já cadastrada
+          schema:
+            type: object
+            properties:
+              Erro:
+                type: string
+                example: "Turma Já Cadastrada!"
+        422:
+          description: Professor informado não cadastrado
+          schema:
+            type: object
+            properties:
+              Erro:
+                type: string
+                example: "Professor Não Cadastrado!"
+              
+  /turmas/{turma_id}:
+    get:
+      tags:
+        - Turmas
+      summary: Exibir Turma Específica
+      operationId: getTurmaById
+      description: Retorna informações de Turmas cadastrada ou retorna uma mensagem informando que não encontrou essa turma
+      parameters:
+        - name: turma_id_id
+          in: path
+          required: true
+          type: integer
+      responses:
+        200:
+          description: Turma encontrada no sistema
+          schema:
+            $ref: '#/definitions/Turma'
+        404:
+          description: Nenhuma Turma encontrado com esse ID
+          schema:
+            type: object
+            properties:
+              Erro:
+                type: string
+                example: "Turma Não Cadastrada!"
+    put:
+      tags:
+        - Turmas
+      summary: Atualizar Cadastro Turma
+      operationId: updateTurma
+      description: Atualizar cadastro de Turma no sistema e retornar mensagem confirmando a atualização ou retorna mensagem referente aos erros de Body incompleto; Turma não cadastrada ou Professor não cadastrado
+      parameters:
+        - name: turma_id
+          in: path
+          required: true
+          type: integer
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/TurmaInput'
+      responses:
+        200:
+          description: Cadastro Turma Atualizada
+          schema:
+            type: object
+            properties:
+              Mensagem:
+                type: string
+                example: "Turma Atualizada com Sucesso!"
+        400:
+          description: Dados faltando no corpo da requisição
+          schema:
+            type: object
+            properties:
+              Erro:
+                type: string
+                example: "Formulário Incompleto!"
+        404:
+          description: Nenhum turma encontrada com esse ID
+          schema:
+            type: object
+            properties:
+              Erro:
+                type: string
+                example: "Turma Não Cadastrada!"
+        422:
+          description: Professor informado não cadastrado
+          schema:
+            type: object
+            properties:
+              Erro:
+                type: string
+                example: "Professor Não Cadastrado!"
+    delete:
+      tags:
+        - Turmas
+      summary: Deletar Cadastro Turma
+      operationId: deleteTurma
+      description: Deletar cadastro de Turma no sistema e retornar mensagem confirmando a exclusão ou retornar mensagem referente aos erros de não encontrar a turma ou Aluno vinculado a turma
+      parameters:
+        - name: turma_id
+          in: path
+          required: true
+          type: integer
+      responses:
+        200:
+          description: Cadastro Turma Deletado
+          schema:
+            type: object
+            properties:
+              Mensagem:
+                type: string
+                example: "Turma Deletada com Sucesso!"
+        404:
+          description: Nenhuma turma encontrado com esse ID
+          schema:
+            type: object
+            properties:
+              Erro:
+                type: string
+                example: "Turma Não Cadastrada!"
+        409:
+          description: Turma com registro de aluno ativo
+          schema:
+            type: object
+            properties:
+              Erro:
+                type: string
+                example: "Turma com Aluno Vinculado!"
+
+# Alunos
+  /alunos:
+    get:
+      tags:
+        - Alunos
+      summary: Listar Alunos Cadastrados
+      operationId: getAlunos
+      description: Retorna uma lista de todos os alunos cadastrados no sistema e suas informações ou retorna uma mensagem informando que a lista está vazia
+      responses:
+        200:
+          description: Lista de alunos cadastrados com dados
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Aluno'
+        404:
+          description: Nenhum aluno encontrado
+          schema:
+            type: object
+            properties:
+              Erro:
+                type: string
+                example: "Lista de Alunos Vazia!"
+    post:
+      tags:
+        - Alunos
+      summary: Cadastrar Aluno
+      operationId: createAluno
+      description: Cadastar Aluno no sistema e retornar mensagem confirmando o cadastro ou retorna mensagem referente aos erros de Body incompleto; Turma não cadastrada ou Aluno já cadastrado
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/AlunoInput'
+      responses:
+        201:
+          description: Aluno Cadastrado
+          schema:
+            type: object
+            properties:
+              Mensagem:
+                type: string
+                example: "Aluno Cadastrado com Sucesso!"
+        400:
+          description: Dados faltando no corpo da requisição
+          schema:
+            type: object
+            properties:
+              Erro:
+                type: string
+                example: "Formulário Incompleto!"
+        409:
+          description: Aluno já cadastrado
+          schema:
+            type: object
+            properties:
+              Erro:
+                type: string
+                example: "Aluno Já Cadastrado!"
+        422:
+          description: Turma informada não cadastrada
+          schema:
+            type: object
+            properties:
+              Erro:
+                type: string
+                example: "Turma Não Cadastrada!"
+              
+  /alunos/{aluno_id}:
+    get:
+      tags:
+        - Alunos
+      summary: Exibir Aluno Específico
+      operationId: getAlunoById
+      description: Retorna informações de Aluno cadastrado ou retorna uma mensagem informando que não encontrou esse aluno
+      parameters:
+        - name: aluno_id
+          in: path
+          required: true
+          type: integer
+      responses:
+        200:
+          description: Aluno encontrado no sistema
+          schema:
+            $ref: '#/definitions/Aluno'
+        404:
+          description: Nenhum aluno encontrado com esse ID
+          schema:
+            type: object
+            properties:
+              Erro:
+                type: string
+                example: "Aluno Não Cadastrado!"
+    put:
+      tags:
+        - Alunos
+      summary: Atualizar Cadastro Aluno
+      operationId: updateAluno
+      description: Atualizar cadastro de Aluno no sistema e retornar mensagem confirmando a atualização ou retorna mensagem referente aos erros de Body incompleto; Aluno não cadastrado ou Turma não cadastrada
+      parameters:
+        - name: aluno_id
+          in: path
+          required: true
+          type: integer
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/AlunoInput'
+      responses:
+        200:
+          description: Cadastro Aluno Atualizado
+          schema:
+            type: object
+            properties:
+              Mensagem:
+                type: string
+                example: "Aluno Atualizado com Sucesso!"
+        400:
+          description: Dados faltando no corpo da requisição
+          schema:
+            type: object
+            properties:
+              Erro:
+                type: string
+                example: "Formulário Incompleto!"
+        404:
+          description: Nenhum aluno encontrado com esse ID
+          schema:
+            type: object
+            properties:
+              Erro:
+                type: string
+                example: "Aluno Não Cadastrado!"
+        422:
+          description: Turma informada não cadastrada
+          schema:
+            type: object
+            properties:
+              Erro:
+                type: string
+                example: "Turma Não Cadastrada!"
+    delete:
+      tags:
+        - Alunos
+      summary: Deletar Cadastro Aluno
+      operationId: deleteAluno
+      description: Deletar cadastro de Aluno no sistema e retornar mensagem confirmando a exclusão ou retornar mensagem informando que não encontrou esse aluno
+      parameters:
+        - name: aluno_id
+          in: path
+          required: true
+          type: integer
+      responses:
+        200:
+          description: Cadastro Aluno Deletado
+          schema:
+            type: object
+            properties:
+              Mensagem:
+                type: string
+                example: "Aluno Deletado com Sucesso!"
+        404:
+          description: Nenhum aluno encontrado com esse ID
+          schema:
+            type: object
+            properties:
+              Erro:
+                type: string
+                example: "Aluno Não Cadastrado!"
